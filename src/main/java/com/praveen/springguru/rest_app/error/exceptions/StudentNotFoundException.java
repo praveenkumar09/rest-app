@@ -1,4 +1,4 @@
-package com.praveen.springguru.rest_app.error;
+package com.praveen.springguru.rest_app.error.exceptions;
 
 /**
  * The StudentNotFoundException class represents an exception that is thrown when a student is not found.

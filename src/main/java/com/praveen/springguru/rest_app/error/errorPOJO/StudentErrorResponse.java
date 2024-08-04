@@ -1,4 +1,4 @@
-package com.praveen.springguru.rest_app.error;
+package com.praveen.springguru.rest_app.error.errorPOJO;
 
 /**
  * The StudentErrorResponse class represents an error response containing the status, message,

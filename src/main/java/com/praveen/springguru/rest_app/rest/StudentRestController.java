@@ -1,11 +1,8 @@
 package com.praveen.springguru.rest_app.rest;
 
 import com.praveen.springguru.rest_app.entity.Student;
-import com.praveen.springguru.rest_app.error.StudentErrorResponse;
-import com.praveen.springguru.rest_app.error.StudentNotFoundException;
+import com.praveen.springguru.rest_app.error.exceptions.StudentNotFoundException;
 import jakarta.annotation.PostConstruct;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -89,23 +86,8 @@ public class StudentRestController {
                 .findFirst()
                 .orElse(null);
         if(studentOb == null)
-                throw new StudentNotFoundException("student with id " + studentId + " not found");
+                throw new StudentNotFoundException("student id not found : " + studentId);
         return studentOb;
     }
 
-    /**
-     * This method handles the exception when a Student is not found.
-     *
-     * @param e the StudentNotFoundException to be handled.
-     * @return a ResponseEntity containing a StudentErrorResponse object with details of the error.
-     */
-    @ExceptionHandler
-    public ResponseEntity<StudentErrorResponse> handleStudentNotFound(StudentNotFoundException e) {
-        StudentErrorResponse errorResponse = new StudentErrorResponse();
-        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(System.currentTimeMillis());
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-
-    }
 }
