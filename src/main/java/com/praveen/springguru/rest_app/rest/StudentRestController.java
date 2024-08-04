@@ -1,11 +1,12 @@
 package com.praveen.springguru.rest_app.rest;
 
 import com.praveen.springguru.rest_app.entity.Student;
+import com.praveen.springguru.rest_app.error.StudentErrorResponse;
+import com.praveen.springguru.rest_app.error.StudentNotFoundException;
 import jakarta.annotation.PostConstruct;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,26 +64,48 @@ public class StudentRestController {
     }
 
     /**
-     * Retrieves a student with the given student ID.
+     * Retrieves a student with the specified ID.
      *
-     * This method searches for a student in the "students" list based on the provided student ID.
-     * It uses a stream to filter the list of students and find the first student with a matching ID.
-     * If no student is found with the given ID, null is returned.
+     * This method takes in an integer value representing the student's ID and returns the corresponding Student object.
+     * It searches for the student in the "students" list by filtering the list based on the student ID. If a match is found,
+     * the first matching student object is returned. If no student is found with the specified ID, a StudentNotFoundException
+     * is thrown.
      *
      * Example usage:
      * <pre>{@code
      * StudentRestController studentController = new StudentRestController();
-     * Student student = studentController.getStudent(1);
+     * int studentId = 1;
+     * Student student = studentController.getStudent(studentId);
      * }</pre>
      *
      * @param studentId the ID of the student to retrieve.
-     * @return the Student object if found, or null if not found.
+     * @return the Student object corresponding to the given student ID.
+     * @throws StudentNotFoundException if no student is found with the specified ID.
      */
     @GetMapping("/students/{studentId}")
     public Student getStudent(@PathVariable int studentId) {
-        return students.stream()
+        Student studentOb = students.stream()
                 .filter(student -> student.getId() == studentId)
                 .findFirst()
                 .orElse(null);
+        if(studentOb == null)
+                throw new StudentNotFoundException("student with id " + studentId + " not found");
+        return studentOb;
+    }
+
+    /**
+     * This method handles the exception when a Student is not found.
+     *
+     * @param e the StudentNotFoundException to be handled.
+     * @return a ResponseEntity containing a StudentErrorResponse object with details of the error.
+     */
+    @ExceptionHandler
+    public ResponseEntity<StudentErrorResponse> handleStudentNotFound(StudentNotFoundException e) {
+        StudentErrorResponse errorResponse = new StudentErrorResponse();
+        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        errorResponse.setMessage(e.getMessage());
+        errorResponse.setTimestamp(System.currentTimeMillis());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+
     }
 }
